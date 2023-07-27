@@ -15,4 +15,6 @@ COPY . /app/
 
 RUN npx prisma migrate deploy
 
+RUN npm build
+
 CMD ["npm", "start"]
