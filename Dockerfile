@@ -15,6 +15,6 @@ COPY . /app/
 
 RUN npx prisma migrate deploy
 
-RUN npm build
+RUN npx tsc
 
 CMD ["npm", "start"]
