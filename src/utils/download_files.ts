@@ -101,7 +101,11 @@ const generateRandomName = (size: number): string => {
 function getFileType(extension: string): string {
   const mimeType = mime.lookup(extension);
   if (mimeType) {
-    return mimeType.split('/')[0];
+    const value = mimeType.split('/')[0];
+    if (value === 'mpga') {
+      return 'mp3';
+    }
+    return value;
   }
   return 'unknown';
 }

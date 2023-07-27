@@ -1,22 +1,20 @@
-import { getHost, isUrl } from '../utils/url_utils';
+import { getProvider, isUrl } from '../utils/url_utils';
 import { ApiError } from '../core/api_error';
 import downloadVideosFromAllPlatforms from '../utils/videos/all';
-import prisma from '../prisma';
 import getSavedFiles from './get_files_save';
 import { File } from '@prisma/client';
-import createOrFindUrl from './createOrFinUrl';
+
 import FileModel from '../models/file.model';
 import { Host } from '../models/host.enum';
+import tikTokVideoDl from '../utils/videos/tiktok';
+import createManyFiles from './create_file';
+import createUrlIfNotExists from './create_url_if_not_exists';
+import prisma from '../prisma';
 type CallbackFileDl = (url: string) => Promise<FileModel[]>;
 
 const hostDl: any = {
-  [Host.FACEBOOK]: () => {},
-
-  [Host.TWITTER]: () => {},
-
-  [Host.INSTAGRAM]: () => {},
-  [Host.INSTAGRAM_PROFILE]: () => {},
-  [Host.PINTEREST]: () => {},
+  [Host.TIKTOK]: tikTokVideoDl,
+  [Host.FACEBOOK]: undefined,
 };
 
 const downloadService = async (url: string): Promise<File[]> => {
@@ -30,31 +28,21 @@ const downloadService = async (url: string): Promise<File[]> => {
   }
 
   let filesModel: FileModel[] = [];
-  const host = getHost(url);
-  if (hostDl.hasOwnProperty(host)) {
+  const host = getProvider(url);
+  if (hostDl[host] !== undefined) {
     filesModel = await (hostDl[host] as CallbackFileDl)(url);
-  } else {
+  }
+  if (filesModel.length == 0)
     filesModel = await downloadVideosFromAllPlatforms(url);
-  }
-  await createOrFindUrl(url);
-  const result: File[] = [];
 
-  for (const fileModel of filesModel) {
-    const createdFile = await prisma.file.create({
-      data: {
-        size: fileModel.size,
-        path: fileModel.path,
-        errorMessage: fileModel.errorMessage,
-        quality: fileModel.quality,
-        type: fileModel.type,
-        url: {
-          connect: { url: url },
-        },
-      },
-    });
-    result.push(createdFile);
-  }
-  return result;
+  const urlModel = await createUrlIfNotExists(url);
+
+  prisma.url.update({
+    where: { url: url },
+    data: {
+      files: {},
+    },
+  });
 };
 
 export default downloadService;

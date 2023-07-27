@@ -14,9 +14,8 @@ const isInstagramProfileUrl = (url: string): boolean => {
     /^(?:https?:\/\/)?(?:www.)?instagram.com\/[^\/\n]+\/?(?:\?igshid=[^\/\n]+)?$/gm;
   return regexProfile.test(url);
 };
-const getHost = (url: string): Host => {
+const getProvider = (url: string): Host => {
   const { hostname } = new URL(url);
-  console.log(hostname);
   switch (hostname) {
     case 'twitter.com':
       return Host.TWITTER;
@@ -28,8 +27,10 @@ const getHost = (url: string): Host => {
     case 'pinterest.com':
       return Host.PINTEREST;
     case 'tiktok.com':
+    case 'vm.tiktok.com':
       return Host.TIKTOK;
     case 'facebook.com':
+    case 'm.facebook.com':
     case 'fb.watch':
       return Host.FACEBOOK;
     default:
@@ -37,4 +38,4 @@ const getHost = (url: string): Host => {
   }
 };
 
-export { isUrl, isInstagramProfileUrl, isInstagramUrl, getHost };
+export { isUrl, isInstagramProfileUrl, isInstagramUrl, getProvider };

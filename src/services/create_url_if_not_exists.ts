@@ -1,7 +1,7 @@
 import { Url } from '@prisma/client';
 import prisma from '../prisma';
 
-const createOrFindUrl = async (uri: string): Promise<Url> => {
+const createUrlIfNotExists = async (uri: string): Promise<Url> => {
   const existingUrl = await prisma.url.findUnique({
     where: {
       url: uri,
@@ -19,4 +19,4 @@ const createOrFindUrl = async (uri: string): Promise<Url> => {
   return newUrl;
 };
 
-export default createOrFindUrl;
+export default createUrlIfNotExists;
