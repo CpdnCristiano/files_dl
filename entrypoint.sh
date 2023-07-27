@@ -1,3 +1,4 @@
+cd /app
 echo "Starting migration"
 npx prisma migrate deploy 
 echo "end migration"
