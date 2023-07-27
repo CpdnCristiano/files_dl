@@ -15,8 +15,9 @@ RUN npm install
 
 COPY . /app/
 
-RUN npx prisma migrate deploy
+COPY entrypoint.sh /app
 
-RUN tsc
+RUN chmod +x /app/entrypoint.sh
 
-CMD ["npm", "start"]
+ENTRYPOINT [ "/app/entrypoint.sh" ]
+

@@ -12,6 +12,7 @@ import { TiktokDL as tk1 } from '@tobyg74/tiktok-api-dl';
 const HOST = process.env.HOST;
 
 interface ResultModel {
+  id?: number;
   path: string;
   errorMessage: string | null;
   size: number;
@@ -81,6 +82,7 @@ downloadRouter.post(
       const result: ResultModel[] = [];
       for (const file of files) {
         result.push({
+          id: file.id,
           errorMessage: file.errorMessage,
           filename: path.basename(file.path),
           origin: url as string,

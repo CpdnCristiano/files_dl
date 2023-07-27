@@ -7,7 +7,7 @@ import { File } from '@prisma/client';
 import FileModel from '../models/file.model';
 import { Host } from '../models/host.enum';
 import tikTokVideoDl from '../utils/videos/tiktok';
-import createManyFiles from './create_file';
+import createManyFiles from './create_file_on_url';
 import createUrlIfNotExists from './create_url_if_not_exists';
 import prisma from '../prisma';
 type CallbackFileDl = (url: string) => Promise<FileModel[]>;
@@ -35,14 +35,10 @@ const downloadService = async (url: string): Promise<File[]> => {
   if (filesModel.length == 0)
     filesModel = await downloadVideosFromAllPlatforms(url);
 
-  const urlModel = await createUrlIfNotExists(url);
+  if (filesModel.length == 0) return [];
 
-  prisma.url.update({
-    where: { url: url },
-    data: {
-      files: {},
-    },
-  });
+  await createUrlIfNotExists(url);
+  return await createManyFiles(filesModel, url);
 };
 
 export default downloadService;
