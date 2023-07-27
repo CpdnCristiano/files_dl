@@ -1,0 +1,39 @@
+{
+  "name": "files_dl",
+  "version": "1.0.0",
+  "description": "Baixar arquivos de diversas rede social e outros sites",
+  "main": "index.js",
+  "scripts": {
+    "start": "node build/server.js",
+    "dev": "ts-node-dev --inspect --transpile-only --ignore-watch node_modules src/server.ts",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/CpdnCristiano/files_dl.git"
+  },
+  "author": "cpdncristiano",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/CpdnCristiano/files_dl/issues"
+  },
+  "homepage": "https://github.com/CpdnCristiano/files_dl#readme",
+  "devDependencies": {
+    "@types/express": "^4.17.17",
+    "@types/swagger-jsdoc": "^6.0.1",
+    "@types/swagger-ui-express": "^4.1.3",
+    "prisma": "^5.0.0",
+    "ts-node-dev": "^2.0.0",
+    "typescript": "^5.1.6"
+  },
+  "dependencies": {
+    "@bochilteam/scraper": "^4.2.4",
+    "@prisma/client": "^5.0.0",
+    "@tobyg74/tiktok-api-dl": "^1.0.4",
+    "axios": "^1.4.0",
+    "dotenv": "^16.3.1",
+    "express": "^4.18.2",
+    "swagger-jsdoc": "^6.2.8",
+    "swagger-ui-express": "^5.0.0"
+  }
+}
