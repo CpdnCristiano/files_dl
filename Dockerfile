@@ -3,7 +3,7 @@ FROM node:16.15-alpine
 RUN npm install -g typescript
 
 WORKDIR /app
-ENV NODE_ENV=production
+#ENV NODE_ENV=production
 
 ENV PATH /app/node_modules/.bin:$PATH
 RUN apk add --no-cache ffmpeg
