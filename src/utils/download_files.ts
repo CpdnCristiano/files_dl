@@ -57,7 +57,13 @@ export default downloadFile;
 const dl = async (url: string, filePath: string): Promise<void> => {
   return await new Promise<void>((resolve, reject) => {
     axios
-      .get(url, { responseType: 'stream' })
+      .get(url, {
+        responseType: 'stream',
+        headers: {
+          'User-Agent':
+            'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/80.0.3987.149 Safari/537.36',
+        },
+      })
       .then((response) => {
         response.data.pipe(fs.createWriteStream(filePath));
         response.data.on('end', () => {
@@ -80,7 +86,12 @@ const generateUniqueFilename = (ext: string): string => {
 };
 const getFileExtension = async (url: string): Promise<string> => {
   try {
-    const { headers } = await axios.head(url);
+    const { headers } = await axios.head(url, {
+      headers: {
+        'User-Agent':
+          'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/80.0.3987.149 Safari/537.36',
+      },
+    });
     const contentType = headers['content-type'];
     const fileExtension = mime.extension(contentType);
     if (fileExtension) {
