@@ -4,6 +4,7 @@ interface CreateFileOptions {
   errorMessage?: string;
   type?: string;
   quality?: string;
+  hash?: string;
 }
 class FileModel {
   public size: number;
@@ -11,13 +12,22 @@ class FileModel {
   public errorMessage?: string;
   public type?: string;
   public quality?: string;
+  public hash?: string;
 
-  constructor({ size, path, errorMessage, quality, type }: CreateFileOptions) {
+  constructor({
+    size,
+    path,
+    errorMessage,
+    quality,
+    type,
+    hash,
+  }: CreateFileOptions) {
     this.size = size;
     this.path = path;
     this.errorMessage = errorMessage;
     this.type = type;
     this.quality = quality;
+    this.hash = hash;
   }
 }
 export default FileModel;

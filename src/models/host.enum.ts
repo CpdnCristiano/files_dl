@@ -7,4 +7,5 @@ export enum Host {
   TWITTER = 'twitter',
   PINTEREST = 'pinterest',
   OTHER = 'other',
+  CHARACTERAI = 'characterai',
 }

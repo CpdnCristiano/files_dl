@@ -1,7 +1,6 @@
 import { File } from '@prisma/client';
 import FileModel from '../models/file.model';
 import prisma from '../prisma';
-import { dare } from '@bochilteam/scraper';
 
 const createManyFiles = async (
   filesModel: FileModel[],
@@ -19,6 +18,7 @@ const createManyFiles = async (
               errorMessage: fileModel.errorMessage,
               quality: fileModel.quality,
               type: fileModel.type,
+              hash: fileModel.hash,
             };
           }),
         },

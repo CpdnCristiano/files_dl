@@ -3,6 +3,7 @@ import FileModel from '../models/file.model';
 import fs from 'fs';
 import path from 'path';
 import mime from 'mime';
+import getHashOfFile from './hash_file';
 
 const PUBLIC_DIR = process.env.PUBLICR_DIR || 'public';
 
@@ -16,6 +17,12 @@ const downloadFile = async (
   { extension, quality }: DownloadOptions = {}
 ): Promise<FileModel> => {
   extension ??= await getFileExtension(url);
+  if (extension.trim() == '') {
+    extension ??= await getFileExtension(url);
+  }
+  if (extension === 'mpga') {
+    extension = 'mp3';
+  }
   const uniqueFilename = generateUniqueFilename(extension);
   const dir = path.join(PUBLIC_DIR, folder);
   const filePath = path.join(dir, uniqueFilename);
@@ -27,9 +34,9 @@ const downloadFile = async (
     return new FileModel({
       size: fs.statSync(filePath).size,
       path: filePath,
-
       quality: quality,
       type: getFileType(extension),
+      hash: await getHashOfFile(filePath),
     });
   } catch (error: any) {
     return new FileModel({
@@ -102,9 +109,7 @@ function getFileType(extension: string): string {
   const mimeType = mime.lookup(extension);
   if (mimeType) {
     const value = mimeType.split('/')[0];
-    if (value === 'mpga') {
-      return 'mp3';
-    }
+
     return value;
   }
   return 'unknown';

@@ -1,0 +1,189 @@
+version: '3.3'
+networks:
+  proxy-net:
+    external: true
+  db_network:
+    name: 'db_network'    
+    external: true
+  network-multibots:
+    name: "network-multibots"
+services:
+  multibots_db:
+    container_name: multibots_db
+    image: mysql
+    environment:
+      MYSQL_DATABASE: 'BOT'
+      MYSQL_USER: 'bot'
+      MYSQL_PASSWORD: 'nm74yt6mrpg76x5q'
+      MYSQL_ROOT_PASSWORD: '131282159357'
+    volumes:
+      - type: bind
+        source: ./mysql/data
+        target: /var/lib/mysql
+        volume:
+          nocopy: true
+    restart: always
+    networks:
+      network-multibots:
+    ports:
+      - "9997:3306"
+
+  multibots_backend:
+    container_name: multibots_backend
+    build: ./BACK/
+    entrypoint: /app/entrypoint.sh
+    environment:
+      NODE_ENV: production
+      BACKEND_URL: https://stickers.api.bot.cpdntech.com.br
+      FRONTEND_URL: "https://sticker.painel.cpdntech.com.br"
+      PROXY_PORT: 8080
+      PORT: 8080
+      TC_SERVER: http://traccar:8082
+      DB_DIALECT: mysql
+      DB_HOST: multibots_db
+      DB_USER: bot
+      DB_PASS: nm74yt6mrpg76x5q
+      DB_NAME: BOT
+
+      JWT_SECRET: miojo
+      JWT_REFRESH_SECRET: miojo
+
+      WIT_TOKEN: EC2VAG6AKY7MXCAHORRKUW4FU2VGGV4M
+      TECHNICAL_CONTACT: 5593991232087
+      FINANCE_CONTACT: 5593991232087
+
+    labels:
+      - 'traefik.enable=true'
+      - 'traefik.docker.network=proxy-net'
+      - 'traefik.http.routers.multibots_backend.rule=Host(`stickers.api.bot.cpdntech.com.br`)'
+      - 'traefik.http.routers.multibots_backend.entrypoints=websecure'
+      - 'traefik.http.routers.multibots_backend.tls.certresolver=myresolver'
+      - 'traefik.http.services.multibots_backend.loadbalancer.server.port=8080'
+    networks:
+      proxy-net:
+      network-multibots:
+    volumes:
+      - ./sessions:/app/.wwebjs_auth
+      - ./logs:/app/logs
+      - ./public:/app/public
+    restart: always
+    depends_on:
+      - multibots_db
+      - rmbg
+  multibots_frontend:
+    container_name: multibots_frontend
+    build: ./FRONT/
+    labels:
+      - 'traefik.enable=true'
+      - 'traefik.docker.network=proxy-net'
+      - 'traefik.http.routers.multibots_frontend.rule=Host(`sticker.painel.cpdntech.com.br`)'
+      - 'traefik.http.routers.multibots_frontend.entrypoints=websecure'
+      - 'traefik.http.routers.multibots_frontend.tls.certresolver=myresolver'
+      - 'traefik.http.services.multibots_frontend.loadbalancer.server.port=4000'
+    networks:
+      proxy-net:
+    restart: always
+    depends_on:
+      - multibots_backend
+
+  rmbg:
+    container_name: rmbg
+    build: ./rembg/
+    command: python server.py
+    volumes:
+      - ./public:/app/public
+    networks:
+      network-multibots:
+    restart: always
+    deploy:
+      resources:
+        limits:
+          cpus: '0.50'
+          memory: 1024M
+        reservations:
+          cpus: '0.25'
+          memory: 512M
+  nsfw_api:
+    container_name: nsfw_api
+    build: ./NSFW_Detection_API/
+    command: python3 -m api
+    networks:
+      network-multibots:
+    restart: always
+    ports:
+      - "11000:8000"
+    deploy:
+      resources:
+        limits:
+          cpus: '0.50'
+          memory: 1025M
+        reservations:
+          cpus: '0.25'
+          memory: 512M
+  shazamapi:
+    container_name: shazamapi
+    build: ./audio/
+    command: python server.py
+    volumes:
+      - ./public:/app/public
+    networks:
+      network-multibots:
+    restart: always
+    ports:
+      - "11001:8000"
+    deploy:
+      resources:
+        limits:
+          cpus: '0.50'
+          memory: 1024M
+        reservations:
+          cpus: '0.25'
+          memory: 512M
+  imageanalysis:
+    container_name: imageanalysis
+    build: ./image/
+    command: python server.py
+    environment:
+      - PATH_BLUE_PEN=/app/public/bluepen
+    volumes:
+      - ./public:/app/public
+      - ./models:/root/.deepface
+    networks:
+      network-multibots:
+    restart: always
+    ports:
+      - "11002:8000"
+    deploy:
+      resources:
+        limits:
+          cpus: '0.50'
+          memory: 2048M
+        reservations:
+          cpus: '0.25'
+          memory: 512M
+  files_dl:
+    container_name: filesDl
+    build: ./files_dl/
+    #entrypoint: /app/entrypoint.sh
+    environment:
+      PORT: 5001
+      HOST: https://videosdl.cpdntech.com.br
+      PUBLIC_DIR: public
+      DATABASE_URL: "mysql://filedonwload:cafecomleiteeruim@global_db:3306/videos_db"
+    labels:
+      - 'traefik.enable=true'
+      - 'traefik.docker.network=proxy-net'
+      - 'traefik.http.routers.files_dl.rule=Host(`videosdl.cpdntech.com.br`)'
+      - 'traefik.http.routers.files_dl.entrypoints=websecure'
+      - 'traefik.http.routers.files_dl.tls.certresolver=myresolver'
+      - 'traefik.http.services.files_dl.loadbalancer.server.port=5001'
+    networks:
+      proxy-net:
+      network-multibots:
+      db_network:
+        ipv4_address: 10.10.0.10
+
+    volumes:
+      - ./public:/app/public
+    restart: always
+

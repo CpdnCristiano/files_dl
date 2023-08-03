@@ -23,6 +23,7 @@ const getProvider = (url: string): Host => {
     case 'youtube.com':
       return Host.YOUTUBE;
     case 'instagram.com':
+    case 'www.instagram.com':
       return Host.INSTAGRAM;
     case 'pinterest.com':
       return Host.PINTEREST;
@@ -33,6 +34,10 @@ const getProvider = (url: string): Host => {
     case 'm.facebook.com':
     case 'fb.watch':
       return Host.FACEBOOK;
+    case 'characterai.io':
+    case 'beta.character.ai':
+    case 'character.ai':
+      return Host.CHARACTERAI;
     default:
       return Host.OTHER;
   }

@@ -2,17 +2,12 @@
 
 cd /app
 
+echo "Generating Prisma Client"
+npx prisma generate
+
 echo "Starting migration"
 npx prisma migrate deploy
-echo "end migration"
-
-echo "Starting generator"
-npx prisma generate
-echo "end generator"
-
-echo "Starting building"
-npx tsc
-echo "end building"
+echo "End migration"
 
 echo "Starting server!!!"
 node /app/build/server.js

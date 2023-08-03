@@ -18,6 +18,7 @@ model File {
   urlId        Int
   type         String?
   quality      String?
+  hash         String? @unique
   url          Url     @relation(fields: [urlId], references: [id])
 }
 
@@ -25,4 +26,9 @@ model Url {
   id    Int    @id @default(autoincrement())
   url   String @unique
   files File[]
+}
+
+model TiktokId {
+  id  String @id
+  url String @unique
 }
