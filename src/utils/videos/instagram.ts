@@ -1,12 +1,6 @@
-import FileModel from '../../models/file.model';
-import { basename, extname } from 'path';
+import { FileModel } from '../../models/file.model';
+import saveigApp from '../../scrapers/instagram/saveigapp';
 import downloadFile from '../download_files';
-const ig = require('instagram-url-dl');
-
-interface InstagramUrlDlResponse {
-  status: boolean;
-  data: DataInstagramUrlDlResponse[];
-}
 
 interface DataInstagramUrlDlResponse {
   type: string;
@@ -48,18 +42,11 @@ export default instagramVideoDl;
 const instagramSever1 = async (url: string): Promise<FileModel[]> => {
   var files: FileModel[] = [];
   try {
-    const response = (await ig(url)) as InstagramUrlDlResponse;
+    const response = await saveigApp(url);
     if (response?.status) {
       const data = response.data ?? [];
       return Promise.all(
-        data.map((file) =>
-          downloadFile(file.url, 'instagram/instagramurldl', {
-            extension:
-              file.type == 'image'
-                ? extname(basename(file.url.split('?')[0])).substring(1)
-                : 'mp4',
-          })
-        )
+        data.map((file) => downloadFile(file.url, 'instagram/save_ig'))
       );
     }
   } catch (error) {
@@ -81,14 +68,7 @@ const instagramSever2 = async (url: string): Promise<FileModel[]> => {
         }
       }
       return Promise.all(
-        links.map((link) =>
-          downloadFile(link, 'instagram/snapsave', {
-            extension:
-              extname(basename(link.split('?')[0])).trim() != ''
-                ? extname(basename(link.split('?')[0])).substring(1)
-                : 'mp4',
-          })
-        )
+        links.map((link) => downloadFile(link, 'instagram/snapsave'))
       );
     }
   } catch (error) {
@@ -104,14 +84,7 @@ const instagramSever3 = async (url: string): Promise<FileModel[]> => {
       const data = response?.url ?? [];
 
       return Promise.all(
-        data.map((link) =>
-          downloadFile(link, 'instagram/btch', {
-            extension:
-              extname(basename(link.split('?')[0])).trim() != ''
-                ? extname(basename(link.split('?')[0])).substring(1)
-                : 'mp4',
-          })
-        )
+        data.map((link) => downloadFile(link, 'instagram/btch'))
       );
     }
   } catch (error) {

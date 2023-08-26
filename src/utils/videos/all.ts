@@ -1,5 +1,5 @@
 import { savefrom } from '@bochilteam/scraper';
-import FileModel from '../../models/file.model';
+import { FileModel } from '../../models/file.model';
 import downloadFile from '../download_files';
 import { getProvider } from '../url_utils';
 import { Host } from '../../models/host.enum';
@@ -17,7 +17,6 @@ const downloadVideosFromAllPlatforms = async (
         if (v.url) {
           for (const u of v.url) {
             var file = await downloadFile(u.url, 'savefrom', {
-              extension: u.ext,
               quality: u.quality?.toString(),
             });
             files.push(file);

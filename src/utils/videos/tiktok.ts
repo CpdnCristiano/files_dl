@@ -1,11 +1,11 @@
 import { tiktokdl } from '@bochilteam/scraper';
 import { TiktokDL } from '@tobyg74/tiktok-api-dl';
 
-import FileModel from '../../models/file.model';
 import downloadFile from '../download_files';
 import assossiateTikTokIdToUrl from '../../services/assosiate_tiktok_id_to_url';
 import getTikTokId from '../../services/get_tiktok_id';
 import FileAlreadyDownloadedError from '../../core/file_already_downloaded_error';
+import { FileModel } from '../../models/file.model';
 
 const { ttdl } = require('btch-downloader');
 export interface TtdlReponse {
@@ -37,27 +37,22 @@ const tiktokServer1 = async (url: string): Promise<FileModel[]> => {
       const result = data.result;
       if (result) {
         const tiktokId = await getTikTokId(result.id);
-        if (tiktokId) {
+        /* if (tiktokId) {
           throw new FileAlreadyDownloadedError(tiktokId.url);
-        }
+        } */
         const links: string[] = [];
-        const extension = result.type == 'image' ? 'webp' : 'mp4';
         links.push(
           ...((result.type == 'image' ? result.images : result.video) ?? [])
         );
         const files = await Promise.all([
           ...links.map((link) =>
-            downloadFile(link, 'tiktok/tiktok-api-dl/', {
-              extension: extension,
-            })
+            downloadFile(link, 'tiktok/tiktok-api-dl/', {})
           ),
           ...result.music.map((link) =>
-            downloadFile(link, 'tiktok/tiktok-api-dl/', {
-              extension: 'mp3',
-            })
+            downloadFile(link, 'tiktok/tiktok-api-dl/', {})
           ),
         ]);
-        await assossiateTikTokIdToUrl(result.id, url);
+        // await assossiateTikTokIdToUrl(result.id, url);
         return files;
       }
     }
@@ -92,12 +87,8 @@ const tiktokServer3 = async (url: string): Promise<FileModel[]> => {
     var result = (await ttdl(url)) as TtdlReponse;
     if (result.video || result.audio) {
       return Promise.all([
-        ...result.video.map((v) =>
-          downloadFile(v, 'tiktok/btch', { extension: 'mp4' })
-        ),
-        ...result.audio.map((v) =>
-          downloadFile(v, 'tiktok/btch', { extension: 'mp3' })
-        ),
+        ...result.video.map((v) => downloadFile(v, 'tiktok/btch')),
+        ...result.audio.map((v) => downloadFile(v, 'tiktok/btch')),
       ]);
     }
   } catch (error) {

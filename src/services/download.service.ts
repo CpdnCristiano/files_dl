@@ -4,7 +4,6 @@ import downloadVideosFromAllPlatforms from '../utils/videos/all';
 import getSavedFiles from './get_files_save';
 import { File } from '@prisma/client';
 
-import FileModel from '../models/file.model';
 import { Host } from '../models/host.enum';
 import tikTokVideoDl from '../utils/videos/tiktok';
 import createManyFiles from './create_file_on_url';
@@ -13,6 +12,7 @@ import FileAlreadyDownloadedError from '../core/file_already_downloaded_error';
 import instagramVideoDl from '../utils/videos/instagram';
 import characteraiDonwload from '../utils/videos/characterai';
 import twitterDownload from '../utils/videos/twitter';
+import { FileModel } from '../models/file.model';
 type CallbackFileDl = (url: string) => Promise<FileModel[]>;
 
 const hostDl: any = {
@@ -50,8 +50,23 @@ const downloadService = async (url: string): Promise<File[]> => {
 
     if (filesModel.length == 0) return [];
 
-    await createUrlIfNotExists(url);
-    return await createManyFiles(filesModel, url);
+    if (filesModel.findIndex((file) => file.errorMessage == 'unknown') === -1) {
+      await createUrlIfNotExists(url);
+      return await createManyFiles(filesModel, url);
+    } else {
+      return filesModel.map<File>((file) => {
+        return {
+          errorMessage: file.errorMessage || null,
+          hash: file.hash || null,
+          size: file.size,
+          path: file.path,
+          quality: file.quality || null,
+          type: file.type || null,
+          urlId: 0,
+          id: 0,
+        };
+      });
+    }
   } catch (error) {
     if (error instanceof FileAlreadyDownloadedError) {
       const savedFiles = await getSavedFiles(error.url);

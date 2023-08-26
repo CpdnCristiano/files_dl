@@ -1,6 +1,6 @@
 import { File } from '@prisma/client';
-import FileModel from '../models/file.model';
 import prisma from '../prisma';
+import { FileModel } from '../models/file.model';
 
 const createManyFiles = async (
   filesModel: FileModel[],

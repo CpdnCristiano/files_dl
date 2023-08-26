@@ -1,7 +1,7 @@
-import FileModel from '../../models/file.model';
 import downloadFile from '../download_files';
 import FileAlreadyDownloadedError from '../../core/file_already_downloaded_error';
 import { basename, extname } from 'path';
+import { FileModel } from '../../models/file.model';
 
 const { twitter } = require('btch-downloader');
 
@@ -30,7 +30,6 @@ const twitterServer1 = async (url: string): Promise<FileModel[]> => {
       return Promise.all(
         response.map((data) =>
           downloadFile(data.url, 'twitter/btch', {
-            extension: btchgetExtension(data),
             quality: data.quality != '' ? data.quality : undefined,
           })
         )
@@ -43,16 +42,4 @@ const twitterServer1 = async (url: string): Promise<FileModel[]> => {
     console.error(error);
   }
   return files;
-};
-
-const btchgetExtension = (data: TwitterData): string => {
-  if (data.mimetype && data.mimetype != '') {
-    return data.mimetype.split('/')[1];
-  } else {
-    const extension = extname(basename(data.url.split('?')[0])).trim();
-    if (extension.includes('.')) {
-      return extension.substring(1);
-    }
-  }
-  return 'mp4';
 };

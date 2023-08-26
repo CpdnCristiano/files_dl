@@ -10,8 +10,8 @@ import {
 } from '@bochilteam/scraper';
 import { TiktokDL } from '@tobyg74/tiktok-api-dl';
 import removeDuplicates from '../utils/remove_duplicates';
+import saveigApp from '../scrapers/instagram/saveigapp';
 
-const ig = require('instagram-url-dl');
 const snapsave = require('snapsave-downloader');
 const { igdl } = require('btch-downloader');
 
@@ -130,7 +130,9 @@ downloadRouter.post(
           .status(400)
           .json({ error: 'O parâmetro URL é obrigatório.' });
       }
-      return res.status(200).json(await savefrom(url));
+      return res
+        .status(200)
+        .json(await tryDataOnError(async () => await savefrom(url)));
     } catch (error) {
       console.log(error);
       if (error instanceof ApiError) {
@@ -178,7 +180,7 @@ downloadRouter.post(
           .json({ error: 'O parâmetro URL é obrigatório.' });
       }
       const result = await Promise.all([
-        tryDataOnError(async () => await ig(url)),
+        tryDataOnError(async () => await saveigApp(url)),
         tryDataOnError(async () => await snapsave(url)),
         tryDataOnError(async () => await igdl(url)),
         tryDataOnError(async () => await savefrom(url)),
